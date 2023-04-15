@@ -23,7 +23,7 @@ public class PessoaDAO {
             //buscar conexão com Banco de Dados
             Connection con = Conexao.getConexao();
             //criar script sql de insert
-            String sql = "insert into pessoas values(null, ?,?,?,)";
+            String sql = "insert into pessoas values(null, ?,?,?,?)";
             //criar espaço para executar script
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, pVO.getNome());
@@ -51,7 +51,7 @@ public class PessoaDAO {
                 p.setNome(rs.getString("nome"));
                 p.setCpf(rs.getString("cpf"));
                 p.setEndereco(rs.getString("endereco"));
-                p.setTelefone("telefone");
+                p.setTelefone(rs.getString("telefone"));
                 pessoas.add(p);
             }
         } catch (SQLException e) {

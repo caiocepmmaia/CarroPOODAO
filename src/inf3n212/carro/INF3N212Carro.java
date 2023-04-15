@@ -10,6 +10,8 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import model.Carro;
 import model.Pessoa;
+import serviços.PessoaServicos;
+import serviços.ServicosFactory;
 import util.Validadores;
 
 /**
@@ -131,6 +133,7 @@ public class INF3N212Carro {
 
     private static void cadastrarPessoa() {
         System.out.println("    Cadastrar Pessoa    ");
+        PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
         int idPessoa;
         String nome;
         String cpf;
@@ -143,7 +146,7 @@ public class INF3N212Carro {
             cpf = leia.nextLine();
             tcpf = Validadores.isCPF(cpf);
             if (tcpf) {
-                if (cadPessoa.getPessoaCPF(cpf) != null) {
+                if (pessoaS.getPessoaByDoc(cpf).getCpf() != null) {
                     System.out.println("CPF já cadastrado!");
                     System.out.println("1 - Tentar novamente");
                     System.out.println("2 - Cancelar");
@@ -175,7 +178,8 @@ public class INF3N212Carro {
         telefone = leia.nextLine();
         idPessoa = cadPessoa.geraID();
         Pessoa p = new Pessoa(idPessoa, nome, cpf, endereco, telefone);
-        cadPessoa.addPessoa(p);
+        //cadPessoa.addPessoa(p);
+        pessoaS.cadastroPessoa(p);
         System.out.println(p.getNome() + " cadastrado com sucesso!");
     }//fim cadastro pessoa
 
@@ -254,6 +258,7 @@ public class INF3N212Carro {
     }// fim cadastro carro
 
     private static void editarPessoa() {
+        PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
         System.out.println("    Editar Pessoa   ");
         boolean isCPF;
         do {
@@ -261,8 +266,8 @@ public class INF3N212Carro {
             String cpf = leia.nextLine();
             isCPF = Validadores.isCPF(cpf);
             if (isCPF) {
-                Pessoa p = cadPessoa.getPessoaCPF(cpf);
-                if (p != null) {
+                Pessoa p = pessoaS.getPessoaByDoc(cpf);
+                if (p.getCpf() != null) {
                     do {
                         System.out.println("Quais dados de " + p.getNome() + " deseja alterar? ");
                         System.out.println("1 - Nome");
@@ -293,6 +298,9 @@ public class INF3N212Carro {
                         }
                         if (op < 0 || op > 4) {
                             System.out.println("Opção inválida, tente novamente.");
+                        }
+                        if (op > 0 && op < 4) {
+                            pessoaS.atualizarPessoa(p);
                         }
                     } while (isCPF);
                 } else {
@@ -356,11 +364,11 @@ public class INF3N212Carro {
                                     if (p != null) {
                                         System.out.println("CPF encontrado " + p.getCpf() + " nome " + p.getNome());
                                         c.setProprietario(p);
-                                        System.out.println("Proprietário do veículo " + c.getMarca() + ", " + c.getModelo() + ", " + c.getPlaca() 
+                                        System.out.println("Proprietário do veículo " + c.getMarca() + ", " + c.getModelo() + ", " + c.getPlaca()
                                                 + " alterado para " + p.getNome() + " de CPF " + p.getCpf());
                                         tcpf = false;
-                                        
-                                    }else{
+
+                                    } else {
                                         System.out.println("CPF não encontrado.");
                                         System.out.println("Deseja tantar outro? ");
                                         System.out.println("1 - Sim | 2 - Cadastrar outra pessoa | 3 - Não");
@@ -368,14 +376,16 @@ public class INF3N212Carro {
                                         op = leiaNumInt();
                                         if (op == 1) {
                                             tcpf = true;
-                                        }if (op == 2) {
+                                        }
+                                        if (op == 2) {
                                             cadastrarPessoa();
-                                        }if (op == 3) {
+                                        }
+                                        if (op == 3) {
                                             tcpf = false;
                                         }
                                     }
 
-                                }else{
+                                } else {
                                     System.out.println("CPF Inválido");
                                     tcpf = true;
                                 }
@@ -406,8 +416,13 @@ public class INF3N212Carro {
 
     private static void listarPessoa() {
         System.out.println("    Listar Pessoa   ");
-        for (Pessoa pessoa : cadPessoa.getPessoas()) {
-            System.out.println(pessoa.toString());
+        PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
+        if (pessoaS.getPessoas().isEmpty()) {
+            System.out.println("Não há ningem cadastrado.");
+        } else {
+            for (Pessoa pessoa : pessoaS.getPessoas()) {
+                System.out.println(pessoa.toString());
+            }
         }
     }
 
@@ -419,6 +434,7 @@ public class INF3N212Carro {
     }
 
     private static void deletarPessoa() {
+        PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
         System.out.println("    Deletar Pessoa  ");
         boolean delCPF = false;
         do {
@@ -426,13 +442,14 @@ public class INF3N212Carro {
             String cpf = leia.nextLine();
             delCPF = Validadores.isCPF(cpf);
             if (delCPF) {
-                Pessoa p = cadPessoa.getPessoaCPF(cpf);
-                if (p != null) {
+                Pessoa p = pessoaS.getPessoaByDoc(cpf);
+                if (p.getCpf() != null) {
                     System.out.println("Deseja realmente deletar " + p.getNome() + "?");
                     System.out.print("1 - Sim | 2 - Não: ");
                     int op = leiaNumInt();
                     if (op == 1) {
-                        cadPessoa.removePessoa(p);
+                        //cadPessoa.removePessoa(p);
+                        pessoaS.deletarPessoa(cpf);
                         System.out.println("Pessoa deletada.");
                         delCPF = false;
                     } else {
@@ -452,8 +469,15 @@ public class INF3N212Carro {
                 }
             } else {
                 System.out.println("CPF inválido!"
-                        + "\nTente novamente");
-                delCPF = true;
+                        + "\nDeseja tentar novamete?\n"
+                        + "1 - Sim | 2 - Não");
+                System.out.print("Digite aqui: ");
+                int op = leiaNumInt();
+                if (op == 1) {
+                    delCPF = true;
+                }else{
+                    delCPF = false;
+                }
             }
         } while (delCPF);
     }// fim deletar pessoa
