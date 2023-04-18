@@ -60,6 +60,8 @@ public class CarroDAO {
                 c.setCor(rs.getString("cor"));
                 c.setTpCambio(rs.getString("tpCambio"));
                 c.setCombustivel(rs.getString("combustivel"));
+                
+                carros.add(c);
 
             }
             
@@ -67,5 +69,27 @@ public class CarroDAO {
             System.out.println("Erro ao lista veículo.\n"
                     + e.getMessage());
         }
+        return carros;
     }
+    
+    public Carro getCarroByDoc(String placa) {
+        Carro c = new Carro();
+        try {
+            Connection con = Conexao.getConexao();
+            String sql = "select + from pessoas where placa = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, placa);
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()){
+                c.setPlaca(rs.getString("placa"));
+                c.setMarca("marca");
+                c.set
+            }
+        }catch (SQLException e){
+            System.out.println("Erro ao buscar placa.\n"
+                    + e.getMessage());
+        }
+        return c;
+    }
+    
 }
