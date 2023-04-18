@@ -101,9 +101,7 @@ public class PessoaDAO {
             + e.getMessage());
         }
     }
-    public void detelatPessoaDAO(String cpf){
-        
-    
+    public void deletarPessoaDAO(String cpf){
             try {
             Connection con = Conexao.getConexao();
             String sql = "delete from pessoas where cpf = ?";
